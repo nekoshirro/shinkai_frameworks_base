@@ -158,6 +158,11 @@ public class PropImitationHooks {
             if (key.startsWith("VERSION.")) {
                 clazz = Build.VERSION.class;
                 key = key.substring(8);
+            } else if (key.equals("SECURITY_PATCH") || key.equals("DEVICE_INITIAL_SDK_INT") || key.equals("RELEASE") || key.equals("SDK_INT")) {
+                clazz = Build.VERSION.class;
+            } else if (key.equals("VERSION_RELEASE")) {
+                clazz = Build.VERSION.class;
+                key = "RELEASE";
             }
             Field field = clazz.getDeclaredField(key);
             field.setAccessible(true);

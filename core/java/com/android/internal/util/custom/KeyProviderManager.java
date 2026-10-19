@@ -143,7 +143,7 @@ public final class KeyProviderManager {
             for (String entry : ctx.getResources().getStringArray(R.array.config_attestationKeychain)) {
                 String[] parts = entry.split(":", 2);
                 if (parts.length == 2) {
-                    keyboxData.put(parts[0], parts[1]);
+                    keyboxData.put(parts[0].trim(), parts[1].trim());
                 }
             }
 
@@ -163,13 +163,9 @@ public final class KeyProviderManager {
 
         @Override
         public boolean hasKeybox() {
-            if (!keyboxData.containsKey("EC.PRIV") || !keyboxData.containsKey("RSA.PRIV")) {
-                return false;
-            }
-            if (!keyboxData.containsKey("EC.CERT_1") || !keyboxData.containsKey("RSA.CERT_1")) {
-                return false;
-            }
-            return true;
+            boolean hasEc = keyboxData.containsKey("EC.PRIV") && keyboxData.containsKey("EC.CERT_1");
+            boolean hasRsa = keyboxData.containsKey("RSA.PRIV") && keyboxData.containsKey("RSA.CERT_1");
+            return hasEc || hasRsa;
         }
 
         @Override
@@ -194,14 +190,12 @@ public final class KeyProviderManager {
 
         private String[] getCertificateChain(String prefix) {
             List<String> dataList = new ArrayList<>();
-            for (String key : keyboxData.keySet()) {
-                if (key.startsWith(prefix + ".CERT_")) {
-                    dataList.add(keyboxData.get(key));
-                }
+            int i = 1;
+            while (keyboxData.containsKey(prefix + ".CERT_" + i)) {
+                dataList.add(keyboxData.get(prefix + ".CERT_" + i));
+                i++;
             }
-            String[] chain = dataList.toArray(String[]::new);
-            Arrays.sort(chain);
-            return chain;
+            return dataList.toArray(String[]::new);
         }
     }
 }

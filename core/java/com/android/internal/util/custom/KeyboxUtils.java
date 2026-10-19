@@ -45,6 +45,7 @@ public class KeyboxUtils {
         String base64 = input
                 .replaceAll("-----BEGIN [^-]+-----", "")
                 .replaceAll("-----END [^-]+-----", "")
+                .replace("\\n", "")
                 .replaceAll("\\s+", "");
         return Base64.getDecoder().decode(base64);
     }
