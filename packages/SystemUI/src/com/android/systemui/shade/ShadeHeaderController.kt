@@ -436,6 +436,7 @@ constructor(
         systemIconsHoverContainer.setOnHoverListener(
             statusOverlayHoverListenerFactory.createListener(systemIconsHoverContainer)
         )
+        updateColors()
     }
 
     override fun onViewDetached() {

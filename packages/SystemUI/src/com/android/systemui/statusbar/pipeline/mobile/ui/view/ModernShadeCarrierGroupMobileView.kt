@@ -53,14 +53,37 @@ class ModernShadeCarrierGroupMobileView(context: Context, attrs: AttributeSet?) 
 
     var subId: Int = -1
 
-    private lateinit var binding: ModernShadeCarrierGroupMobileViewBinding
+    private var binding: ModernShadeCarrierGroupMobileViewBinding? = null
+    private var pendingStyle: Int? = null
+    private var pendingFgColor: Int? = null
+    private var pendingBgColor: Int? = null
 
     /**
      * Update the appearance of the mobile carrier group. The text itself can use the text
      * appearance resId, but the mobile icon needs to know specifically about fg/bg colors.
      */
     fun setStyleAndTint(@StyleRes styleResId: Int, fgColor: Int, bgColor: Int) {
-        binding.setStyleAndTint(style = styleResId, fgColor = fgColor, bgColor = bgColor)
+        val b = binding
+        if (b != null) {
+            b.setStyleAndTint(style = styleResId, fgColor = fgColor, bgColor = bgColor)
+        } else {
+            pendingStyle = styleResId
+            pendingFgColor = fgColor
+            pendingBgColor = bgColor
+        }
+    }
+
+    internal fun setBinding(newBinding: ModernShadeCarrierGroupMobileViewBinding) {
+        binding = newBinding
+        val style = pendingStyle
+        val fg = pendingFgColor
+        val bg = pendingBgColor
+        if (style != null && fg != null && bg != null) {
+            newBinding.setStyleAndTint(style, fg, bg)
+            pendingStyle = null
+            pendingFgColor = null
+            pendingBgColor = null
+        }
     }
 
     override fun toString(): String {
@@ -99,7 +122,7 @@ class ModernShadeCarrierGroupMobileView(context: Context, attrs: AttributeSet?) 
                     val textView = requireViewById<AutoMarqueeTextView>(R.id.mobile_carrier_text)
                     val shadeCarrierBinding = ShadeCarrierBinder.bind(textView, viewModel)
 
-                    binding =
+                    setBinding(
                         object : ModernShadeCarrierGroupMobileViewBinding {
                             override fun setStyleAndTint(
                                 @StyleRes style: Int,
@@ -110,6 +133,7 @@ class ModernShadeCarrierGroupMobileView(context: Context, attrs: AttributeSet?) 
                                 shadeCarrierBinding.setTextAppearance(style)
                             }
                         }
+                    )
                 }
         }
 
@@ -168,13 +192,14 @@ class ModernShadeCarrierGroupMobileView(context: Context, attrs: AttributeSet?) 
                             kairosNetwork,
                             this,
                         )
-                    view.binding =
+                    view.setBinding(
                         object : ModernShadeCarrierGroupMobileViewBinding {
                             override fun setStyleAndTint(style: Int, fgColor: Int, bgColor: Int) {
                                 iconView.setStaticDrawableColor(fgColor, bgColor)
                                 shadeCarrierBinding.setTextAppearance(style)
                             }
                         }
+                    )
                 }
         }
     }
